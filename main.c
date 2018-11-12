@@ -38,10 +38,10 @@ token gettoken(char *expr) {
 				switch(currchar) {
 					case '0':case '1':case '2': case '3':
 					case '4':case '5':case '6': case '7':
-					case '8':case '9':
+					case '8':case '9':case '.':
 						nextstate = NUMBER;
 						currstate = nextstate;
-						addDigit(&(t.val), currchar);
+						append(&(t.val), currchar);
 						i++;
 						break;
 					case '+': case '-': case '*': case '/': case '%': case '(': case ')':
@@ -49,7 +49,7 @@ token gettoken(char *expr) {
 						t.type = OPERAND;
 						currstate = nextstate;
 						i++;
-						j=1;
+						j = 1;
 						return t;
 						
 						break;
@@ -78,8 +78,8 @@ token gettoken(char *expr) {
 				switch(currchar) {
 					case '0':case '1':case '2': case '3':
 					case '4':case '5':case '6': case '7':
-					case '8':case '9':
-						addDigit(&(t.val), currchar);
+					case '8':case '9':case '.':
+						append(&(t.val), currchar);
 						t.type = OPERATOR;
 						t.op = expr[i - 1];
 						nextstate = NUMBER;
@@ -87,8 +87,17 @@ token gettoken(char *expr) {
 						i++;
 						return t;
 						break;
-					case '+': case '-': case '*': case '/': case '%': case '(': case ')':
+					case '+': case '*': case '/': case '%': case '(': case ')':
 						nextstate = OP;
+						t.type = OPERATOR;
+						t.op = expr[i - 1];
+						currstate = nextstate;
+						i++;
+						return t;
+						break;
+					case '-':
+						nextstate = OP;
+						(t.val).sign = -1;
 						t.type = OPERATOR;
 						t.op = expr[i - 1];
 						currstate = nextstate;
@@ -132,7 +141,7 @@ token gettoken(char *expr) {
 					case '0':case '1':case '2': case '3':
 					case '4':case '5':case '6': case '7':
 					case '8':case '9':
-						addDigit(&(t.val), currchar);
+						append(&(t.val), currchar);
 						nextstate = NUMBER;
 						i++;
 						break;
@@ -165,9 +174,6 @@ int prec(char opr) {
 		case '*': case '/':
 			return 2;
 			break;	
-		case '%': 
-			return 3;
-			break;	
 		case '(':
 			return 0;
 			break;
@@ -186,37 +192,30 @@ char getprevop(cstack **s1) {
 }
 
 int calculate(stack **top1, char opr) {
-	Integer op1;
-	Integer op2, result;
-	initInteger(&op1);
-	initInteger(&op2);
-	initInteger(&result);
+	Integer *op1;
+	Integer *op2, *result;
+	initInteger(op1);
+	initInteger(op2);
+	initInteger(result);
 	op1 = pop(top1);
 	op2 = pop(top1);
 	
 	switch(opr) {
 		case '+':
-			result = addIntegers(op1,op2);
+			result = addnum(op1,op2);
 			break;
 			
 		case '-':
-			result = substractIntegers(op2,op1);
+			result = subnum(op2,op1);
 			break;
 		
-		/*case '*':
-			result = op2 * op1;
+		case '*':
+			result = mulnum(op1,op2);
 			break;
 
 		case '/':
-			if(op1 != 0)
-				result = op2 / op1;
-			else
-				return INT_MIN;
+			result = division(op2,op1);
 			break;
-		
-		case '%':
-			result = op2 % op1;
-			break;*/
 	}
 	
 	push(top1, result);
@@ -224,10 +223,10 @@ int calculate(stack **top1, char opr) {
 }
 
 
-Integer findinfix(char *expr) {
+Integer *findinfix(char *expr) {
 	token t;
-	Integer fres;
-	initInteger(&fres);
+	Integer *fres;
+	initInteger(fres);
 	char prevop, currchar, opr;
 	stack *top1; 
 	cstack *top2;
@@ -239,7 +238,7 @@ Integer findinfix(char *expr) {
 	while(1) {
 		t = gettoken(expr);
 		if(t.type == OPERAND) {
-			push(&top1, t.val);
+			push(&top1, &(t.val));
 		} 
 		
 		else if(t.type == OPERATOR) {
@@ -270,7 +269,6 @@ Integer findinfix(char *expr) {
 							break;
 						else 
 							prevop = getprevop(&top2);
-					
 					}
 					charpush(&top2, currchar);
 				}	
@@ -320,10 +318,11 @@ int readline(char *line, int len) {
 }
 
 int main(int argc, char *argv[]) {
-	char line[32];
-	Integer r;
-	initInteger(&r);
-	while(readline(line, 32)) {
+	char line[128];
+	Integer *r;
+	initInteger(r);
+	printf("A");
+	while(readline(line, 128)) {
 		r = findinfix(line);
 		//if(r != INT_MIN)
 			printInteger(r);
