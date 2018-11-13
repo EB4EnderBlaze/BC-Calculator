@@ -7,7 +7,7 @@ void initInteger(Integer *a) {
 	node *p;
 	p = (node *)malloc(sizeof(node));
 	p->ch = '0';
-	p->prev = p->next = NULL; //Given that list is singly linked NULL terminated
+	p->prev = p->next = NULL; //Given that list is doubly linked NULL terminated
 	a->head = a->tail = p;
 	//Will initialise integer by creating one node which has value zero stored in it. The head, tail, prev and next pointers all point to the same node in this case
 }
