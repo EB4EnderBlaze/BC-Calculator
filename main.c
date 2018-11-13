@@ -159,10 +159,10 @@ token gettoken(char *expr) {
 
 int prec(char opr) {
 	switch(opr) {
-		case '+': case '-':
+		case '+': case '-':case '*': 
 			return 1;
 			break;	
-		case '*': case '/':
+		case '/':
 			return 2;
 			break;	
 		case '%': 
@@ -203,11 +203,11 @@ int calculate(stack **top1, char opr) {
 			result = substractIntegers(op2,op1);
 			break;
 		
-		/*case '*':
-			result = op2 * op1;
+		case '*':
+			result = mulnum(&op2,&op1);
 			break;
 
-		case '/':
+		/*case '/':
 			if(op1 != 0)
 				result = op2 / op1;
 			else

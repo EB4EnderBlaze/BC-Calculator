@@ -22,11 +22,6 @@ typedef struct cstack {
 	struct cstack *next;
 }cstack;
 
-typedef struct signstack {
-	char sign;
-	struct signstack *next;
-}signstack;
-
 void initInteger(Integer *a);
 void addDigit(Integer *a, char c);
 Integer createIntegerFromString(char *str);
@@ -46,9 +41,7 @@ int charisempty(cstack*);
 
 int dec(Integer *a);
 
-/*Further required : 
- *Stack to store sign of each number that is stored in the Integer stack. When an Integer is popped from the stack, its respective sign shall also be popped from this stack at same time. 
- *The Integer stack we have currently uses character data type to store the data. Hence it will automatically take care of the decimal point as well
-*/
+Integer mulnum(Integer *a, Integer *b);
+
 
 
